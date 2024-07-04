@@ -91,9 +91,9 @@ function EFFECT:Init( data )
     local CustomBloodParticle = ent:GetNWString( "DynamicBloodSplatter_CustomBlood_Particle", false )
     local blood_particle = CustomBloodParticle or blood_impact_fx[blood_color]
 
-    if PARTICLE:GetBool() && blood_particle then
-        ParticleEffect(blood_particle, pos, AngleRand())
-    end
+    -- if PARTICLE:GetBool() && blood_particle then
+    --     ParticleEffect(blood_particle, pos, AngleRand())
+    -- end
     
     
 
@@ -143,7 +143,7 @@ function EFFECT:Init( data )
     for effectNum = 1, Lerp( math.Clamp(damage / SENSITIVITY:GetInt(), 0, 1), 1, COUNT:GetInt() ) do
 
         -- Chance for additional splatter effect going in the opposite direction:
-        local splash_back = DROP_CHANCE:GetInt() != 0 && magnitude>0.9 && math.random( 1, SPLAT_BACK_CHANCE:GetInt() )==1
+        local splash_back = SPLAT_BACK_CHANCE:GetInt() != 0 && magnitude>0.9 && math.random( 1, SPLAT_BACK_CHANCE:GetInt() )==1
 
 
         -- Chance for additional splatter effect that drops to the floor under the target:

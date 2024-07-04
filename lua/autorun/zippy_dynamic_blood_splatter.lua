@@ -240,6 +240,10 @@ if SERVER then
     
     hook.Add("OnEntityCreated", "OnEntityCreated_DynamicBloodSplatter", function( ent )
         if !EnabledCvar:GetBool() then return end
+
+        if ent:IsNPC() or ent:IsNextBot() then
+            ent:SetNWBool("DynSplatter", true)
+        end
     
     
         -- timer.Simple(0.1, function()
