@@ -31,6 +31,13 @@ end
 
 local function DMG_NoBleed( dmginfo )
 
+    -- -- Damage type tester
+    -- for i = 1, 30 do
+    --     print(2^i, dmginfo:IsDamageType(2^i))
+    -- end
+
+
+
     -- Fire damage
     if dmginfo:IsDamageType(DMG_BURN) && dmginfo:IsDamageType(DMG_DIRECT) then
         return true
@@ -41,7 +48,10 @@ local function DMG_NoBleed( dmginfo )
         return true
     end
 
+
+
     return false
+
 
 end
 
@@ -55,19 +65,20 @@ end
 
 local PrecachedParticles = {}
 local function NetworkCustomBlood( ent )
-
     local CustomDecal
     local CustomParticle
 
 
     if ent.IsVJBaseSNPC or ent.IsVJBaseCorpse then
-        -- VJ
+
         CustomDecal = ent.CustomBlood_Decal && ent.CustomBlood_Decal[1]
         CustomParticle = ent.CustomBlood_Particle && ent.CustomBlood_Particle[1]
+
     elseif ent.IsZBaseNPC or ent.IsZBaseRag then
-        -- ZBASE
+
         CustomDecal = ent.CustomBloodDecals
         CustomParticle = ent.CustomBloodParticles && ent.CustomBloodParticles[1]
+    
     end
 
     -- Hunter ragdoll should always have "blood_impact_synth_01" if nothing else was provided
@@ -76,17 +87,15 @@ local function NetworkCustomBlood( ent )
     end
 
 
-    -- Network if custom decal updated
     if CustomDecal && ent.DynSplatter_LastCustomDecal != CustomDecal then
         ent:SetNWString( "DynamicBloodSplatter_CustomBlood_Decal", CustomDecal )
         ent.DynSplatter_LastCustomDecal = CustomDecal
     end
 
 
-    -- Network if custom particle updated
     if CustomParticle && ent.DynSplatter_LastCustomParticle != CustomParticle then
 
-        -- Precache particle
+        -- Precache
         if !PrecachedParticles[CustomParticle] then
             PrecachedParticles[CustomParticle] = true
             PrecacheParticleSystem(CustomParticle)
@@ -96,32 +105,42 @@ local function NetworkCustomBlood( ent )
         ent.DynSplatter_LastCustomParticle = CustomParticle
 
     end
-
 end
 
 
 local function Damage( ent, dmginfo )
-    if DMG_NoBleed(dmginfo) then return end -- Don't bleed if forbidden damage type, such as burn
-    if bit.band( ent:GetFlags(), FL_DISSOLVING ) == FL_DISSOLVING then return end -- Don't bleed dissolving entities:
+    -- Don't bleed on burn damage for example:
+    if DMG_NoBleed(dmginfo) then return end
+
+
+    -- Don't bleed dissolving entities:
+    if bit.band( ent:GetFlags(), FL_DISSOLVING ) == FL_DISSOLVING then return end
+
 
     local damage = dmginfo:GetDamage()
     local force = dmginfo:GetDamageForce()
     local infl = dmginfo:GetInflictor()
 
-    -- If force is not provided, calculate force based on damage position
+
     if force:IsZero() && IsValid(infl) then
         force = ent:GetPos() - dmginfo:GetDamagePosition()
+        debugoverlay.Line(ent:WorldSpaceCenter(), ent:WorldSpaceCenter()+force)
     end
 
+
+    local bullet_damage_type = IsBulletDamage( dmginfo )
     local phys_damage_type = dmginfo:IsDamageType(DMG_CRUSH)
+
 
     local phys_damage = damage > 10 && phys_damage_type
     local weapon_damage = (IsValid(infl) && infl:IsWeapon())
     local crossbow_damage = (IsValid(infl) && infl:GetClass() == "crossbow_bolt")
 
+
     -- Put blood effect on damage position if it was bullet damage or physics damage or if the inflictor was a weapon, otherwise put it in the center of the entity.
-    local blood_pos = ( (IsBulletDamage( dmginfo ) or weapon_damage or phys_damage or crossbow_damage) && dmginfo:GetDamagePosition() ) or ent:WorldSpaceCenter()
+    local blood_pos = ( (bullet_damage_type or weapon_damage or phys_damage or crossbow_damage) && dmginfo:GetDamagePosition() ) or ent:WorldSpaceCenter()
     local magnitude = phys_damage&&0.5 or 1.2
+
 
     if phys_damage or (!phys_damage_type && damage > 0) then
         EnhancedSplatter( ent, blood_pos, force, magnitude, phys_damage && 1 or damage )

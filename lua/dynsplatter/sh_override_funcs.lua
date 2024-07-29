@@ -19,6 +19,7 @@ function ENT:GetBloodColor()
 
     if DynSplatterReturnEngineBlood then
         DynSplatterReturnEngineBlood = false
+        -- print( self,  DynSplatterEntGetBloodColor(self) )
         return DynSplatterEntGetBloodColor(self) or DONT_BLEED
     end
 
