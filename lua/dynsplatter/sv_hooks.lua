@@ -148,23 +148,23 @@ local function Damage( ent, dmginfo )
 end
 
 
-local function regHit( npc, pos )
-    npc.DynSplatter_Hits = npc.DynSplatter_Hits or {}
-    table.insert(npc.DynSplatter_Hits, pos)
-    conv.callNextTick(function() npc.DynSplatter_Hits = nil end)
-end
+-- local function regHit( npc, pos )
+--     npc.DynSplatter_Hits = npc.DynSplatter_Hits or {}
+--     table.insert(npc.DynSplatter_Hits, pos)
+--     conv.callNextTick(function() npc.DynSplatter_Hits = nil end)
+-- end
 
 
-hook.Add("ScaleNPCDamage", "EnhancedSplatter", function( npc, hitgr, dmginfo )
-    if !npc:GetNWBool("DynSplatter") then return end
-    regHit(npc, dmginfo:GetDamagePosition())
-end)
+-- hook.Add("ScaleNPCDamage", "EnhancedSplatter", function( npc, hitgr, dmginfo )
+--     if !npc:GetNWBool("DynSplatter") then return end
+--     regHit(npc, dmginfo:GetDamagePosition())
+-- end)
 
 
-hook.Add("ScalePlayerDamage", "EnhancedSplatter", function( ply, hitgr, dmginfo )
-    if !ply:GetNWBool("DynSplatter") then return end
-    regHit(ply, dmginfo:GetDamagePosition())
-end)
+-- hook.Add("ScalePlayerDamage", "EnhancedSplatter", function( ply, hitgr, dmginfo )
+--     if !ply:GetNWBool("DynSplatter") then return end
+--     regHit(ply, dmginfo:GetDamagePosition())
+-- end)
 
 
 hook.Add("EntityTakeDamage", "EnhancedSplatter", function( ent, dmginfo )
@@ -172,30 +172,47 @@ hook.Add("EntityTakeDamage", "EnhancedSplatter", function( ent, dmginfo )
 
 
     NetworkCustomBlood( ent )
+    Damage( ent, dmginfo )
 
+    -- if ent.DynSplatter_Hits then
 
-    if ent.DynSplatter_Hits then
+    --     local infl = dmginfo:GetInflictor()
+    --     if !IsValid(infl) then infl = dmginfo:GetAttacker() end
 
-        local infl = dmginfo:GetInflictor()
-        if !IsValid(infl) then infl = dmginfo:GetAttacker() end
+    --     for _, pos in ipairs(ent.DynSplatter_Hits) do
+    --         local dmginfo2 = DamageInfo()
+    --         dmginfo2:SetAttacker(dmginfo:GetAttacker())
+    --         dmginfo2:SetInflictor(infl)
+    --         dmginfo2:SetDamage(dmginfo:GetDamage() / #ent.DynSplatter_Hits)
+    --         dmginfo2:SetDamagePosition(pos)
+    --         dmginfo2:SetDamageType(dmginfo:GetDamageType())
+    --         dmginfo2:SetDamageForce(dmginfo:GetDamageForce())
+    --         Damage(ent, dmginfo2)
+    --     end
 
-        for _, pos in ipairs(ent.DynSplatter_Hits) do
-            local dmginfo2 = DamageInfo()
-            dmginfo2:SetAttacker(dmginfo:GetAttacker())
-            dmginfo2:SetInflictor(infl)
-            dmginfo2:SetDamage(dmginfo:GetDamage() / #ent.DynSplatter_Hits)
-            dmginfo2:SetDamagePosition(pos)
-            dmginfo2:SetDamageType(dmginfo:GetDamageType())
-            dmginfo2:SetDamageForce(dmginfo:GetDamageForce())
-            Damage(ent, dmginfo2)
-        end
+    -- else
 
-    else
+    --     Damage( ent, dmginfo )
 
-        Damage( ent, dmginfo )
-
-    end
+    -- end
 end)
+
+
+-- local didBulletCode = false
+-- hook.Add("EntityFireBullets", "dynsplatter", function( ent, data )
+--     if didBulletCode then didBulletCode = false return end
+--     if !GetConVar("dynamic_blood_splatter_enable"):GetBool() then return end
+
+
+--     data.Callback = conv.wrapFunc2( data.Callback or function(_, attacker, tr, dmginfo) end, nil, function(_, attacker, tr, dmginfo)
+--     end)
+
+
+--     didBulletCode = true
+--     hook.Run("EntityFireBullets", ent, data)
+--     return true
+
+-- end)
 
 
 hook.Add("OnEntityCreated", "OnEntityCreated_DynamicBloodSplatter", function( ent )
