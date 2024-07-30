@@ -56,7 +56,6 @@ local alien_blood_colors = {
 
 
 local CustomBloodMaterials = {}
-local PrecachedParticles = {}
 
 
 -- Sounds:
@@ -78,11 +77,6 @@ function EFFECT:Init( data )
     local ent = data:GetEntity()
     local flags = data:GetFlags()-1
     local blood_color = (IsValid(ent) && ent:GetBloodColor()) or flags
-    if blood_color == DONT_BLEED then
-        return
-    end
-
-
     local pos = data:GetOrigin()
     local magnitude = data:GetMagnitude()
     local damage = data:GetRadius()
@@ -135,7 +129,6 @@ function EFFECT:Init( data )
         blood_mats = table.Copy(CustomBloodMaterials[CustomBloodDecal])
 
     end
-
 
 
     -- No blood materials, can't do effect
