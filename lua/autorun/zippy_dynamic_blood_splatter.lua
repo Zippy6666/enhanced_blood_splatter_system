@@ -28,32 +28,20 @@ end)
 --[[============================ CONV MESSAGE END ============================]]--
 
 
-
-
-
-
 AddCSLuaFile("dynsplatter/sh_override_funcs.lua")
-
-
-game.AddParticles("particles/blood_impact.pcf")
-PrecacheParticleSystem("blood_impact_synth_01")
-
-CreateConVar("dynamic_blood_splatter_enable", bit.bor(FCVAR_ARCHIVE, FCVAR_REPLICATED))
-
-
-
-
+AddCSLuaFile("dynsplatter/sh_hooks.lua")
+include("dynsplatter/sh_hooks.lua")
+if SERVER then
+    include("dynsplatter/sv_hooks.lua")
+end
 hook.Add("InitPostEntity", "DynSplatterOverrideFuncs", function() timer.Simple(0.5, function()
     include("dynsplatter/sh_override_funcs.lua")
     DynSplatterFullyInitialized = true
 end) end)
 
 
-
-
-if SERVER then
-    include("dynsplatter/sv_hooks.lua")
-end
+game.AddParticles("particles/blood_impact.pcf")
+PrecacheParticleSystem("blood_impact_synth_01")
 
 
 DynSplatterEnabledCvar = CreateConVar("dynamic_blood_splatter_enable_mod", "1", bit.bor(FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY))

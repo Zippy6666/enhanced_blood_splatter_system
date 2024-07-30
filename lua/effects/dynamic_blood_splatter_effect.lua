@@ -12,9 +12,6 @@ local FORCE_MULT = CreateConVar("dynamic_blood_splatter_force_mult", "1.25", FCV
 local STAIN_ENTS = CreateConVar("dynamic_blood_splatter_stain_ents", "1", FCVAR_ARCHIVE)
 
 
---]]===========================================================================================]]
-
-
 -- Use default blood stains as materials for the effect, and decals.
 local blood_materials = {}
 for i = 1,8 do
@@ -29,6 +26,9 @@ for i = 1,6 do
     local imat = Material("decals/yblood"..i)
     table.insert(alienblood_materials, imat)
 end
+
+
+local sparkMat = Material("effects/spark")
 
 
 -- Random decal lenght and width:
@@ -72,12 +72,15 @@ local blood_drop_sounds = {
 }
 
 
---]]===========================================================================================]]
+
+
 function EFFECT:Init( data )
     local pos = data:GetOrigin()
     local magnitude = data:GetMagnitude()
     local ent = data:GetEntity()
     if !IsValid(ent) then return end
+
+    -- MsgN("effect dispatch")
 
 
     local blood_color = ent:GetBloodColor()
@@ -99,6 +102,7 @@ function EFFECT:Init( data )
 
     -- Decide blood materials to use:
     local blood_mats
+    local do_decal = true
     local CustomBloodDecal = ent:GetNWString( "DynamicBloodSplatter_CustomBlood_Decal", false )
 
     if blood_color == BLOOD_COLOR_RED then
@@ -110,6 +114,11 @@ function EFFECT:Init( data )
 
         -- Yellow blood
         blood_mats = table.Copy(alienblood_materials)
+
+    elseif blood_color == BLOOD_COLOR_MECH then
+
+        blood_mats = {sparkMat}
+        do_decal = false
 
     elseif CustomBloodDecal then
 
@@ -189,26 +198,29 @@ function EFFECT:Init( data )
                         if hasDoneCollide[effIndex] then return end
 
 
-                        local decal_scale = ( blood_color==BLOOD_COLOR_RED && RED_DECAL_SCALE:GetFloat() )
-                        or ( alien_blood_colors[blood_color] && YELLOW_DECAL_SCALE:GetFloat() ) or 1
+                        if do_decal then
+                            local decal_scale = ( blood_color==BLOOD_COLOR_RED && RED_DECAL_SCALE:GetFloat() )
+                            or ( alien_blood_colors[blood_color] && YELLOW_DECAL_SCALE:GetFloat() ) or 1
 
-                        util.DecalEx(
-                            blood_material,
-                            ent or Entity(0),
-                            collidepos,
-                            normal,
-                            Color(255, 255, 255),
-                            math.Rand(decal_randscale.min, decal_randscale.max)*decal_scale,
-                            math.Rand(decal_randscale.min, decal_randscale.max)*decal_scale
-                        )
+                            
+                            util.DecalEx(
+                                blood_material,
+                                ent or Entity(0),
+                                collidepos,
+                                normal,
+                                Color(255, 255, 255),
+                                math.Rand(decal_randscale.min, decal_randscale.max)*decal_scale,
+                                math.Rand(decal_randscale.min, decal_randscale.max)*decal_scale
+                            )
 
 
-                        if IMPACT_PARTICLE:GetBool() && blood_particle then
-                            ParticleEffect(blood_particle, collidepos, normal:Angle())
-                        end
+                            if IMPACT_PARTICLE:GetBool() && blood_particle then
+                                ParticleEffect(blood_particle, collidepos, normal:Angle())
+                            end
 
-                        if IMPACT_SOUND:GetBool() then
-                            sound.Play(table.Random(blood_drop_sounds), collidepos, 77, math.random(95, 120), 0.7)
+                            if IMPACT_SOUND:GetBool() then
+                                sound.Play(table.Random(blood_drop_sounds), collidepos, 77, math.random(95, 120), 0.7)
+                            end
                         end
 
 
@@ -250,8 +262,10 @@ function EFFECT:Init( data )
     
     emitter:Finish()
 end
---]]===========================================================================================]]
+
+
 function EFFECT:Think() return false end
---]]===========================================================================================]]
+
+
 function EFFECT:Render() end
---]]===========================================================================================]]
+

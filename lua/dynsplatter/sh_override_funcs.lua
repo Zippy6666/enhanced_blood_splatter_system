@@ -8,13 +8,14 @@ DynSplatterCvarGetInt = DynSplatterCvarGetInt or Cvar.GetInt
 DynSplatterReturnEngineBlood = false
 
 
---]]===========================================================================================]]
+
 function ENT:DisableEngineBlood()
 
     DynSplatterEntSetBloodColor(self, DONT_BLEED)
 
 end
---]]===========================================================================================]]
+
+
 function ENT:GetBloodColor()
 
     if DynSplatterReturnEngineBlood then
@@ -32,7 +33,8 @@ function ENT:GetBloodColor()
     return DynSplatterEntGetBloodColor(self) or DONT_BLEED
     
 end
---]]===========================================================================================]]
+
+
 function ENT:SetBloodColor( col )
 
     self:SetNWInt("EnhancedSplatter_BloodColor", col)
@@ -42,7 +44,8 @@ function ENT:SetBloodColor( col )
     end
 
 end
---]]===========================================================================================]]
+
+
 function Cvar:GetInt( ... )
 
     -- Disable decals and particles for hlr corpses
@@ -51,7 +54,8 @@ function Cvar:GetInt( ... )
     return DynSplatterCvarGetInt(self, ...)
 
 end
---]]===========================================================================================]]
+
+
 
 
 DynSplatterFullyInitialized = true

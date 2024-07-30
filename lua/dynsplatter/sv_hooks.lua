@@ -138,81 +138,24 @@ local function Damage( ent, dmginfo )
 
 
     -- Put blood effect on damage position if it was bullet damage or physics damage or if the inflictor was a weapon, otherwise put it in the center of the entity.
-    local blood_pos = ( (bullet_damage_type or weapon_damage or phys_damage or crossbow_damage) && dmginfo:GetDamagePosition() ) or ent:WorldSpaceCenter()
+    local blood_pos = ( (weapon_damage or phys_damage or crossbow_damage) && dmginfo:GetDamagePosition() ) or ent:WorldSpaceCenter()
     local magnitude = phys_damage&&0.5 or 1.2
 
 
-    if phys_damage or (!phys_damage_type && damage > 0) then
+    if !bullet_damage_type && ( phys_damage or (!phys_damage_type && damage > 0) ) then
         EnhancedSplatter( ent, blood_pos, force, magnitude, phys_damage && 1 or damage )
     end
 end
 
 
--- local function regHit( npc, pos )
---     npc.DynSplatter_Hits = npc.DynSplatter_Hits or {}
---     table.insert(npc.DynSplatter_Hits, pos)
---     conv.callNextTick(function() npc.DynSplatter_Hits = nil end)
--- end
-
-
--- hook.Add("ScaleNPCDamage", "EnhancedSplatter", function( npc, hitgr, dmginfo )
---     if !npc:GetNWBool("DynSplatter") then return end
---     regHit(npc, dmginfo:GetDamagePosition())
--- end)
-
-
--- hook.Add("ScalePlayerDamage", "EnhancedSplatter", function( ply, hitgr, dmginfo )
---     if !ply:GetNWBool("DynSplatter") then return end
---     regHit(ply, dmginfo:GetDamagePosition())
--- end)
-
-
 hook.Add("EntityTakeDamage", "EnhancedSplatter", function( ent, dmginfo )
-    if !ent:GetNWBool("DynSplatter") then return end
 
+    if !ent:GetNWBool("DynSplatter") then return end
 
     NetworkCustomBlood( ent )
     Damage( ent, dmginfo )
 
-    -- if ent.DynSplatter_Hits then
-
-    --     local infl = dmginfo:GetInflictor()
-    --     if !IsValid(infl) then infl = dmginfo:GetAttacker() end
-
-    --     for _, pos in ipairs(ent.DynSplatter_Hits) do
-    --         local dmginfo2 = DamageInfo()
-    --         dmginfo2:SetAttacker(dmginfo:GetAttacker())
-    --         dmginfo2:SetInflictor(infl)
-    --         dmginfo2:SetDamage(dmginfo:GetDamage() / #ent.DynSplatter_Hits)
-    --         dmginfo2:SetDamagePosition(pos)
-    --         dmginfo2:SetDamageType(dmginfo:GetDamageType())
-    --         dmginfo2:SetDamageForce(dmginfo:GetDamageForce())
-    --         Damage(ent, dmginfo2)
-    --     end
-
-    -- else
-
-    --     Damage( ent, dmginfo )
-
-    -- end
 end)
-
-
--- local didBulletCode = false
--- hook.Add("EntityFireBullets", "dynsplatter", function( ent, data )
---     if didBulletCode then didBulletCode = false return end
---     if !GetConVar("dynamic_blood_splatter_enable"):GetBool() then return end
-
-
---     data.Callback = conv.wrapFunc2( data.Callback or function(_, attacker, tr, dmginfo) end, nil, function(_, attacker, tr, dmginfo)
---     end)
-
-
---     didBulletCode = true
---     hook.Run("EntityFireBullets", ent, data)
---     return true
-
--- end)
 
 
 hook.Add("OnEntityCreated", "OnEntityCreated_DynamicBloodSplatter", function( ent )
