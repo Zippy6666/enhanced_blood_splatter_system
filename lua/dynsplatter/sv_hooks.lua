@@ -217,7 +217,7 @@ end)
 
 hook.Add("OnEntityCreated", "OnEntityCreated_DynamicBloodSplatter", function( ent )
     if !DynSplatterFullyInitialized then return end
-    if !GetConVar("dynamic_blood_splatter_enable"):GetBool() then return end
+    if !DynSplatterEnabledCvar:GetBool() then return end
 
 
     timer.Simple(0.1, function()
@@ -253,7 +253,7 @@ end)
 
 
 hook.Add("CreateEntityRagdoll", "CreateEntityRagdoll_DynamicBloodSplatter", function( own, ragdoll )
-    if !GetConVar("dynamic_blood_splatter_enable"):GetBool() then return end
+    if !DynSplatterEnabledCvar:GetBool() then return end
 
 
     if own.IsVJBaseSNPC then
@@ -275,7 +275,7 @@ end)
 
 
 hook.Add("PlayerSpawn", "RemoveEngineBlood", function( ply )
-    if GetConVar("dynamic_blood_splatter_enable"):GetBool() then
+    if DynSplatterEnabledCvar:GetBool() then
 
         if DynSplatterFullyInitialized then
 

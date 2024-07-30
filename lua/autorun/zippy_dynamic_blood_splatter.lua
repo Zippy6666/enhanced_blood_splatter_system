@@ -1,34 +1,35 @@
-if CLIENT then
-    function MissingConvMsg()
-        local frame = vgui.Create("DFrame")
-        frame:SetSize(300, 125)
-        frame:SetTitle("Missing Library!")
-        frame:Center()
-        frame:MakePopup()
+--[[=========================== CONV MESSAGE START ===========================]]--
+MissingConvMsg2 = CLIENT && function()
 
-        local text = vgui.Create("DLabel", frame)
-        text:SetText("This server does not have the CONV library installed, some addons may function incorrectly. Click the link below to get it:")
-        text:Dock(TOP)
-        text:SetWrap(true)  -- Enable text wrapping for long messages
-        text:SetAutoStretchVertical(true)  -- Allow the text label to stretch vertically
-        text:SetFont("BudgetLabel")
+    Derma_Query(
+        "This server does not have Zippy's Library installed, addons will function incorrectly!",
 
-        local label = vgui.Create("DLabelURL", frame)
-        label:SetText("CONV Library")
-        label:SetURL("https://steamcommunity.com/sharedfiles/filedetails/?id=3146473253")
-        label:Dock(BOTTOM)
-        label:SetContentAlignment(5)  -- 5 corresponds to center alignment
-    end
-elseif SERVER && !file.Exists("convenience/adam.lua", "LUA") then
-    -- Conv lib not on on server, send message to clients
-    hook.Add("PlayerInitialSpawn", "convenienceerrormsg", function( ply )
-        local sendstr = 'MissingConvMsg()'
-        ply:SendLua(sendstr)
-    end)
-end
+        "ZIPPY'S LIBRARY MISSING!",
+        
+        "Get Zippy's Library",
+
+        function()
+            gui.OpenURL("https://steamcommunity.com/sharedfiles/filedetails/?id=3146473253")
+        end,
+
+        "Close"
+    )
+
+end or nil
+
+hook.Add("PlayerInitialSpawn", "MissingConvMsg2", function( ply )
+
+    if file.Exists("autorun/conv.lua", "LUA") then return end
+
+    local sendstr = 'MissingConvMsg2()'
+    ply:SendLua(sendstr)
+
+end)
+--[[============================ CONV MESSAGE END ============================]]--
 
 
---]]===========================================================================================]]
+
+
 
 
 AddCSLuaFile("dynsplatter/sh_override_funcs.lua")
@@ -40,12 +41,14 @@ PrecacheParticleSystem("blood_impact_synth_01")
 CreateConVar("dynamic_blood_splatter_enable", bit.bor(FCVAR_ARCHIVE, FCVAR_REPLICATED))
 
 
---]]===========================================================================================]]
+
+
 hook.Add("InitPostEntity", "DynSplatterOverrideFuncs", function() timer.Simple(0.5, function()
     include("dynsplatter/sh_override_funcs.lua")
     DynSplatterFullyInitialized = true
 end) end)
---]]===========================================================================================]]
+
+
 
 
 if SERVER then
@@ -53,11 +56,13 @@ if SERVER then
 end
 
 
---]]===========================================================================================]]
+DynSplatterEnabledCvar = CreateConVar("dynamic_blood_splatter_enable_mod", "1", bit.bor(FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY))
+
+
 -- Toolmenu --
 if CLIENT then hook.Add("PopulateToolMenu", "PopulateToolMenu_DynamicBloodSplatter", function() spawnmenu.AddToolMenuOption("Options", "Gore", "Enhanced Blood", "Enhanced Blood", "", "", function(panel)
     panel:ControlHelp("\nServer")
-    panel:CheckBox("Enable", "dynamic_blood_splatter_enable")
+    panel:CheckBox("Enable", "dynamic_blood_splatter_enable_mod")
     panel:ControlHelp("Enable addon serverside, won't affect already spawned entities")
     panel:Help("")
 
@@ -117,4 +122,4 @@ if CLIENT then hook.Add("PopulateToolMenu", "PopulateToolMenu_DynamicBloodSplatt
         end
     end
 end) end) end
---]]===========================================================================================]]
+
