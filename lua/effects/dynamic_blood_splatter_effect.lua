@@ -75,35 +75,33 @@ local blood_drop_sounds = {
 
 
 function EFFECT:Init( data )
+    local ent = data:GetEntity()
+    local flags = data:GetFlags()-1
+    local blood_color = (IsValid(ent) && ent:GetBloodColor()) or flags
+    if blood_color == DONT_BLEED then
+        return
+    end
+
+
     local pos = data:GetOrigin()
     local magnitude = data:GetMagnitude()
-    local ent = data:GetEntity()
-    if !IsValid(ent) then return end
-
-    -- MsgN("effect dispatch")
-
-
-    local blood_color = ent:GetBloodColor()
     local damage = data:GetRadius()
     local dataNrm = data:GetNormal()
     local physdamage = magnitude < 1
 
 
-
     -- Particle:
-    local CustomBloodParticle = ent:GetNWString( "DynamicBloodSplatter_CustomBlood_Particle", false )
+    local CustomBloodParticle = IsValid(ent) && ent:GetNWString( "DynamicBloodSplatter_CustomBlood_Particle", false )
     local blood_particle = CustomBloodParticle or blood_impact_fx[blood_color]
 
     if PARTICLE:GetBool() && blood_particle then
         ParticleEffect(blood_particle, pos, AngleRand())
     end
-    
-    
 
     -- Decide blood materials to use:
     local blood_mats
     local do_decal = true
-    local CustomBloodDecal = ent:GetNWString( "DynamicBloodSplatter_CustomBlood_Decal", false )
+    local CustomBloodDecal = IsValid(ent) && ent:GetNWString( "DynamicBloodSplatter_CustomBlood_Decal", false )
 
     if blood_color == BLOOD_COLOR_RED then
 
@@ -193,7 +191,7 @@ function EFFECT:Init( data )
                 
 
                 if i2==1 then
-                    local function collideFunc( _, collidepos, normal, ent )
+                    local function collideFunc( _, collidepos, normal, collEnt )
                         local effIndex = tostring(effectNum).."_"..tostring(i)
                         if hasDoneCollide[effIndex] then return end
 
@@ -205,7 +203,7 @@ function EFFECT:Init( data )
                             
                             util.DecalEx(
                                 blood_material,
-                                ent or Entity(0),
+                                collEnt or Entity(0),
                                 collidepos,
                                 normal,
                                 Color(255, 255, 255),

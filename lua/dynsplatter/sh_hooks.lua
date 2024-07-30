@@ -9,18 +9,15 @@ local function ShouldBulletImpact( ent )
         return true
     end
 
-
     if CLIENT && isMultiplayer then
         return true
     end
-
 
     local entOwn = ent:GetOwner()
     local isPlyFiring = ent:IsPlayer() or (ent:IsWeapon() && IsValid(entOwn) && entOwn:IsPlayer())
     if SERVER && isMultiplayer && !isPlyFiring then
         return true
     end
-
 
     return false
 end
@@ -34,13 +31,16 @@ hook.Add("EntityFireBullets", "dynsplatter", function( ent, data )
 
 
     data.Callback = conv.wrapFunc2( data.Callback or function(_, attacker, tr, dmginfo) end, nil, function(_, attacker, tr, dmginfo)
+
         local effectdata = EffectData()
         effectdata:SetOrigin( tr.HitPos )
         effectdata:SetNormal( -tr.HitNormal )
         effectdata:SetMagnitude( 1.2 )
         effectdata:SetRadius(dmginfo:GetDamage())
         effectdata:SetEntity( tr.Entity )
+        effectdata:SetFlags( (IsValid(tr.Entity) && tr.Entity:GetBloodColor()+1) or DONT_BLEED+1 )
         util.Effect("dynamic_blood_splatter_effect", effectdata, true, true )
+
     end)
 
 

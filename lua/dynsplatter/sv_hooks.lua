@@ -12,16 +12,14 @@ local function EnhancedSplatter( ent, pos, dir, intensity, damage )
 
     else
 
-        norm = dir:GetNormalized()
-
-
-        -- Enhanced splatter lisgooo
+        local norm = dir:GetNormalized()
         local effectdata = EffectData()
         effectdata:SetOrigin( pos )
         effectdata:SetNormal( norm )
         effectdata:SetMagnitude( intensity )
         effectdata:SetRadius(damage)
         effectdata:SetEntity( ent )
+        effectdata:SetFlags( ent:GetBloodColor()+1 )
         util.Effect("dynamic_blood_splatter_effect", effectdata, true, true )
 
     end
@@ -30,13 +28,6 @@ end
 
 
 local function DMG_NoBleed( dmginfo )
-
-    -- -- Damage type tester
-    -- for i = 1, 30 do
-    --     print(2^i, dmginfo:IsDamageType(2^i))
-    -- end
-
-
 
     -- Fire damage
     if dmginfo:IsDamageType(DMG_BURN) && dmginfo:IsDamageType(DMG_DIRECT) then
@@ -48,10 +39,7 @@ local function DMG_NoBleed( dmginfo )
         return true
     end
 
-
-
     return false
-
 
 end
 
@@ -165,6 +153,7 @@ hook.Add("OnEntityCreated", "OnEntityCreated_DynamicBloodSplatter", function( en
 
     timer.Simple(0.1, function()
         if !IsValid(ent) then return end
+
 
 
         if ent.IsVJBaseSNPC then
