@@ -117,6 +117,7 @@ local function Damage( ent, dmginfo )
 
 
     local bullet_damage_type = IsBulletDamage( dmginfo )
+    local do_on_bullet_effect = bullet_damage_type && !DynSplatterPredictCvar:GetBool()
     local phys_damage_type = dmginfo:IsDamageType(DMG_CRUSH)
 
 
@@ -126,11 +127,11 @@ local function Damage( ent, dmginfo )
 
 
     -- Put blood effect on damage position if it was bullet damage or physics damage or if the inflictor was a weapon, otherwise put it in the center of the entity.
-    local blood_pos = ( (weapon_damage or phys_damage or crossbow_damage) && dmginfo:GetDamagePosition() ) or ent:WorldSpaceCenter()
+    local blood_pos = ( (bullet_damage_type or weapon_damage or phys_damage or crossbow_damage) && dmginfo:GetDamagePosition() ) or ent:WorldSpaceCenter()
     local magnitude = phys_damage&&0.5 or 1.2
 
 
-    if !bullet_damage_type && ( phys_damage or (!phys_damage_type && damage > 0) ) then
+    if do_on_bullet_effect && ( phys_damage or (!phys_damage_type && damage > 0) ) then
         EnhancedSplatter( ent, blood_pos, force, magnitude, phys_damage && 1 or damage )
     end
 end

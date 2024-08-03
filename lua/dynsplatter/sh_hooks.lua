@@ -27,6 +27,7 @@ hook.Add("EntityFireBullets", "dynsplatter", function( ent, data )
 
     if didBulletCode then return end
     if !DynSplatterEnabledCvar:GetBool() then return end
+    if !DynSplatterPredictCvar:GetBool() then return end
     if !ShouldBulletImpact(ent) then return end
 
 

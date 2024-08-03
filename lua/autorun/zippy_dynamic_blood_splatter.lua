@@ -45,6 +45,7 @@ PrecacheParticleSystem("blood_impact_synth_01")
 
 
 DynSplatterEnabledCvar = CreateConVar("dynamic_blood_splatter_enable_mod", "1", bit.bor(FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY))
+DynSplatterPredictCvar = CreateConVar("dynamic_blood_splatter_predict", "1", bit.bor(FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY))
 
 
 -- Toolmenu --
@@ -52,6 +53,8 @@ if CLIENT then hook.Add("PopulateToolMenu", "PopulateToolMenu_DynamicBloodSplatt
     panel:ControlHelp("\nServer")
     panel:CheckBox("Enable", "dynamic_blood_splatter_enable_mod")
     panel:ControlHelp("Enable addon serverside, won't affect already spawned entities")
+    panel:CheckBox("Predict", "dynamic_blood_splatter_predict")
+    panel:ControlHelp("Enable prediction serverside")
     panel:Help("")
 
 
