@@ -143,11 +143,11 @@ function EFFECT:Init( data )
     for effectNum = 1, Lerp( math.Clamp(damage / SENSITIVITY:GetInt(), 0, 1), 1, COUNT:GetInt() ) do
 
         -- Chance for additional splatter effect going in the opposite direction:
-        local splash_back = DROP_CHANCE:GetInt() != 0 && magnitude>0.9 && math.random( 1, SPLAT_BACK_CHANCE:GetInt() )==1
+        local splash_back = SPLAT_BACK_CHANCE:GetBool() && magnitude>0.9 && math.random( 1, SPLAT_BACK_CHANCE:GetInt() )==1
 
 
         -- Chance for additional splatter effect that drops to the floor under the target:
-        local drip = DROP_CHANCE:GetInt() != 0 && math.random( 1, DROP_CHANCE:GetInt() )==1
+        local drip = DROP_CHANCE:GetBool() && math.random( 1, DROP_CHANCE:GetInt() )==1
 
 
         for i = 1, 3 do
