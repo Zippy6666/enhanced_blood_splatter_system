@@ -87,7 +87,7 @@ local function NetworkCustomBlood( ent )
     end
 end
 
-local function Damage( ent, dmginfo )
+local function Damage( ent, dmginfo, pos )
     -- Don't bleed on burn damage for example:
     if DMG_NoBleed(dmginfo) then return end
 
@@ -117,7 +117,7 @@ local function Damage( ent, dmginfo )
     local isCrossBowDMG = (IsValid(infl) && infl:GetClass() == "crossbow_bolt")
 
     -- Put blood effect on damage position if it was bullet damage or physics damage or if the inflictor was a weapon, otherwise put it in the center of the entity.
-    local blood_pos = ( (bullet_damage_type or isWepDMG or do_on_phys_effect or isCrossBowDMG) && dmginfo:GetDamagePosition() ) or ent:WorldSpaceCenter()
+    local blood_pos = pos or ( (bullet_damage_type or isWepDMG or do_on_phys_effect or isCrossBowDMG) && dmginfo:GetDamagePosition() ) or ent:WorldSpaceCenter()
     local magnitude = do_on_phys_effect&&0.5 or 1.2
 
     if ( do_on_phys_effect or (!phys_damage_type && damage > 0) ) then
@@ -125,11 +125,30 @@ local function Damage( ent, dmginfo )
     end
 end
 
+hook.Add("ScaleNPCDamage", "EnhancedSplatter", function(npc, iHitGr, dmginfo)
+    if !npc:GetNWBool("DynSplatter") then return end
+
+    if !npc.EnhancedSplatter_BulletHits then
+        npc:CONV_TempVar("EnhancedSplatter_BulletHits", {}, 0)
+    end
+
+    if istable(npc.EnhancedSplatter_BulletHits) then
+        table.insert(npc.EnhancedSplatter_BulletHits, {pos=dmginfo:GetDamagePosition(), dir=dmginfo:GetDamageForce():GetNormalized()})
+    end
+end)
+
 hook.Add("EntityTakeDamage", "EnhancedSplatter", function( ent, dmginfo )
     if !ent:GetNWBool("DynSplatter") then return end
 
     NetworkCustomBlood( ent )
-    Damage( ent, dmginfo )
+
+    if istable(ent.EnhancedSplatter_BulletHits) then
+        for _, v in ipairs(ent.EnhancedSplatter_BulletHits) do
+            Damage(ent, dmginfo, v.pos)
+        end
+    else
+        Damage( ent, dmginfo )
+    end
 end)
 
 hook.Add("OnEntityCreated", "OnEntityCreated_DynamicBloodSplatter", function( ent )
@@ -140,8 +159,8 @@ hook.Add("OnEntityCreated", "OnEntityCreated_DynamicBloodSplatter", function( en
         if !IsValid(ent) then return end
 
         if ent.IsVJBaseSNPC then
-            function ent:SpawnBloodParticles() end
-            function ent:SpawnBloodDecal() end
+            -- function ent:SpawnBloodParticles() end
+            -- function ent:SpawnBloodDecal() end
 
         elseif ent.IsZBaseNPC then
             function ent:CustomBleed() end
