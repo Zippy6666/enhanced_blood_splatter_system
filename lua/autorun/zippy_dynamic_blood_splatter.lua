@@ -27,7 +27,6 @@ hook.Add("PlayerInitialSpawn", "MissingConvMsg2", function( ply )
 end)
 --[[============================ CONV MESSAGE END ============================]]--
 
-
 AddCSLuaFile("dynsplatter/sh_override_funcs.lua")
 AddCSLuaFile("dynsplatter/sh_hooks.lua")
 include("dynsplatter/sh_hooks.lua")
@@ -39,14 +38,11 @@ hook.Add("InitPostEntity", "DynSplatterOverrideFuncs", function() timer.Simple(0
     DynSplatterFullyInitialized = true
 end) end)
 
-
 game.AddParticles("particles/blood_impact.pcf")
 PrecacheParticleSystem("blood_impact_synth_01")
 
-
 DynSplatterEnabledCvar = CreateConVar("dynamic_blood_splatter_enable_mod", "1", bit.bor(FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY))
 DynSplatterPredictCvar = CreateConVar("dynamic_blood_splatter_predict", "1", bit.bor(FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NOTIFY))
-
 
 -- Toolmenu --
 if CLIENT then hook.Add("PopulateToolMenu", "PopulateToolMenu_DynamicBloodSplatter", function() spawnmenu.AddToolMenuOption("Options", "Gore", "Enhanced Blood", "Enhanced Blood", "", "", function(panel)
@@ -113,4 +109,3 @@ if CLIENT then hook.Add("PopulateToolMenu", "PopulateToolMenu_DynamicBloodSplatt
         end
     end
 end) end) end
-

@@ -2,8 +2,6 @@ local isSingleplayer = game.SinglePlayer()
 local isMultiplayer = !isSingleplayer
 local didBulletCode = false
 
-
-
 local function ShouldBulletImpact( ent )
     if isSingleplayer && SERVER then
         return true
@@ -22,14 +20,11 @@ local function ShouldBulletImpact( ent )
     return false
 end
 
-
 hook.Add("EntityFireBullets", "dynsplatter", function( ent, data )
-
     if didBulletCode then return end
     if !DynSplatterEnabledCvar:GetBool() then return end
     if !DynSplatterPredictCvar:GetBool() then return end
     if !ShouldBulletImpact(ent) then return end
-
 
     data.Callback = conv.wrapFunc2( data.Callback or function(_, attacker, tr, dmginfo) end, nil, function(_, attacker, tr, dmginfo)
 
@@ -46,13 +41,10 @@ hook.Add("EntityFireBullets", "dynsplatter", function( ent, data )
 
     end)
 
-
     didBulletCode = true
     hook.Run("EntityFireBullets", ent, data)
     didBulletCode = false
 
-
     return true
-
 end)
 
