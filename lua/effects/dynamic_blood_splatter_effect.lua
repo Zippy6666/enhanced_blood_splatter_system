@@ -89,7 +89,7 @@ function EFFECT:Init( data )
     local blood_particle = CustomBloodParticle or blood_impact_fx[blood_color]
 
     if PARTICLE:GetBool() && blood_particle then
-        ParticleEffect(blood_particle, pos, AngleRand())
+        ParticleEffect(blood_particle, pos, (-dataNrm):Angle())
     end
 
     -- Decide blood materials to use:
@@ -206,7 +206,7 @@ function EFFECT:Init( data )
 
 
                             if IMPACT_PARTICLE:GetBool() && blood_particle then
-                                ParticleEffect(blood_particle, collidepos, normal:Angle())
+                                ParticleEffect(blood_particle, collidepos, (-normal):Angle())
                             end
 
                             if IMPACT_SOUND:GetBool() then
